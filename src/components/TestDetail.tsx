@@ -1,37 +1,36 @@
 import { useEffect } from "react";
-import { Doctor } from "@/data/doctors";
+import { MedicalTest } from "@/data/doctors";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Volume2, MapPin, Clock, DoorOpen, Building2, Stethoscope } from "lucide-react";
+import { ArrowLeft, Volume2, MapPin, Clock, DoorOpen, Building2 } from "lucide-react";
 import { speak, stopSpeaking } from "@/lib/tts";
 import { Lang, t } from "@/lib/i18n";
 
 interface Props {
-  doctor: Doctor;
+  test: MedicalTest;
   lang: Lang;
   onBack: () => void;
 }
 
-export const buildDoctorMessage = (doctor: Doctor, lang: Lang) => {
+export const buildTestMessage = (test: MedicalTest, lang: Lang) => {
   if (lang === "hi") {
-    return `${doctor.name_hi} कक्ष ${doctor.room}, ${doctor.floor_hi} पर उपलब्ध हैं, समय ${doctor.timings_hi}। दिशा: ${doctor.directions_hi}`;
+    return `${test.name_hi} की जांच कक्ष ${test.room}, ${test.floor_hi} पर उपलब्ध है, समय ${test.timings_hi}। दिशा: ${test.directions_hi}`;
   }
-  return `${doctor.name} is available in Room ${doctor.room}, ${doctor.floor}, from ${doctor.timings}. Directions: ${doctor.directions}`;
+  return `${test.name} is available in Room ${test.room}, ${test.floor}, from ${test.timings}. Directions: ${test.directions}`;
 };
 
-export const DoctorDetail = ({ doctor, lang, onBack }: Props) => {
-  const message = buildDoctorMessage(doctor, lang);
-  const name = lang === "hi" ? doctor.name_hi : doctor.name;
-  const specialty = lang === "hi" ? doctor.specialty_hi : doctor.specialty;
-  const floor = lang === "hi" ? doctor.floor_hi : doctor.floor;
-  const timings = lang === "hi" ? doctor.timings_hi : doctor.timings;
-  const directions = lang === "hi" ? doctor.directions_hi : doctor.directions;
+export const TestDetail = ({ test, lang, onBack }: Props) => {
+  const message = buildTestMessage(test, lang);
+  const name = lang === "hi" ? test.name_hi : test.name;
+  const floor = lang === "hi" ? test.floor_hi : test.floor;
+  const timings = lang === "hi" ? test.timings_hi : test.timings;
+  const directions = lang === "hi" ? test.directions_hi : test.directions;
 
   useEffect(() => {
     speak(message, lang);
     return () => stopSpeaking();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [doctor.id, lang]);
+  }, [test.id, lang]);
 
   const InfoRow = ({ icon: Icon, label, value }: { icon: any; label: string; value: string }) => (
     <div className="flex items-start gap-4 p-5 bg-accent/40 rounded-2xl">
@@ -53,16 +52,15 @@ export const DoctorDetail = ({ doctor, lang, onBack }: Props) => {
 
       <Card className="p-8 md:p-10 bg-gradient-card shadow-elevated rounded-3xl border-0">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-hero text-primary-foreground text-4xl font-bold mb-4 shadow-glow animate-pulse-glow">
-            {doctor.name.split(" ").slice(-1)[0][0]}
+          <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-hero text-primary-foreground text-5xl mb-4 shadow-glow animate-pulse-glow">
+            {test.icon}
           </div>
           <h2 className="text-3xl md:text-5xl font-bold text-foreground">{name}</h2>
-          <p className="text-xl md:text-2xl text-primary font-medium mt-2">{specialty}</p>
+          <p className="text-xl md:text-2xl text-primary font-medium mt-2">{t(lang, "test")}</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-4">
-          <InfoRow icon={Stethoscope} label={t(lang, "specialty")} value={specialty} />
-          <InfoRow icon={DoorOpen} label={t(lang, "room")} value={doctor.room} />
+          <InfoRow icon={DoorOpen} label={t(lang, "room")} value={test.room} />
           <InfoRow icon={Building2} label={t(lang, "floor")} value={floor} />
           <InfoRow icon={Clock} label={t(lang, "timings")} value={timings} />
         </div>
